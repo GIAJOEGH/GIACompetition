@@ -26,7 +26,11 @@ function SignIn() {
           .then(res => {
             if(res.data.user.login === 'successful'){
               // console.log(res.data.user)              
-              navigate('/profile', {state: { ...res.data.user, score: 100 }})
+             if(res.data.user.juror && res.data.user.juror.email.includes('@gia.com.gh')){
+              navigate('/juror', {state: { ...res.data.user}})
+             }else{
+              navigate('/contestant', {state: { ...res.data.user}})
+             }
               
             }else{
               // setAlert('Sorry, invalid user or contact Admin!')

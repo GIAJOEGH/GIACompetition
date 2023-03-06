@@ -4,99 +4,114 @@ import { Link, useNavigate,useLocation } from 'react-router-dom';
 import ProfileHeader from '../partials/ProfileHeader';
 import PageIllustration from '../partials/PageIllustration';
 import Banner from '../partials/Banner';
-import axios from 'axios'
+// import axios from 'axios'
 
-const allUploads = []
-let fileList = []
+// let allUploads = []
+
+
+let formdata = new FormData();
+let submit = []
+let sub = []
 
 function Profile({user,...rest}) {
 
   const location = useLocation()
   const [deadline, setDeadline] = useState(false)
   const [file, setFile] = useState([])
-  const [reset, setReset] = useState([])
+  const [reset, setReset] = useState([...location.state.submission])
 
-  
-  
 
   useEffect(()=>{
-    const fileSelector = document.getElementById('file');
+
+    const fileSelector = document.getElementById('file');   
+    const fileList = []
+    // console.log(location.state.submission.length > 0)
+    // (location.state.submission.length >0)?setReset([...location.state.submission]):setReset([])
+    setReset([...location.state.submission])
     fileSelector.addEventListener('change', (event) => {
       
-      const submit = []
-      // event.preventDefault()
+      // setFile([])
       fileList.push(event.target.files);
-      // axios.post('http://localhost:5000/upload', {'files':event.target.files})
-      // .then(res =>{ console.log(res.data)})
-      // .catch(err =>{ console.log('Error: ',err)})
-      
+      // console.log(event.target.files) 
+
       if(fileList[0].length >1){
-        const sub = [...fileList[0]]
-        // console.log(sub.length)
-        sub.map((item,i)=>{
-          submit.push({'upload': item,'date': Date().slice(0,25), 'id': location.state._id})
-          
-          // setFile(prevFile =>[...prevFile, ...submit])
-          // console.log(file)
+        fileList.map((list,i)=>{
+          sub.push(...fileList[i])
         })
-        // setReset([])
+        
+        // console.log(sub)
+        sub.map((item,i)=>{
+          submit.push({'upload': item,'date': Date().slice(0,25), 'id': location.state.userID})
+          
+        })
         setFile([...submit])
-        // console.log(file)
-        // submit.map((mfile)=> {console.log(mfile)})
+
+        while(fileList.length >0){
+          fileList.pop()
+        }
+        while(sub.length >0){
+          sub.pop()
+        }
+        while(submit.length >0){
+          submit.pop()
+        }
       } 
       else{
-        const submission = {'upload': fileList[0][0], 'date': Date().slice(0,25), 'id': location.state._id}
-        setFile(submission)
-        // console.log(submission)
-      }              
+        const submission = {'upload': fileList[0][0], 'date': Date().slice(0,25), 'id': location.state.userID}
+        setFile([submission])
+        
+      } 
+        // console.log(file)
+        
     });
-  },[])
+
+  },[file])
 
   const handleSubmit = (e) => {
     // const navigate = useNavigate();
     e.preventDefault()
-    // let submission = {}
-    
-
-    const formdata = new FormData();
-    //       formdata.append('files',file)
-
+     
     //Setting up the array of files for the backend
     if(!file.length){
-      allUploads.push(file)      
+      // allUploads.push(file)  
+      formdata.append('files',file.upload)  
+      formdata.append('userID',file.id) 
+      formdata.append('date',file.date)
     }else{
       file.map((mfile)=> {
-        allUploads.push(mfile)
-      })
+        // allUploads.push(mfile)
+        formdata.append('files',mfile.upload) 
+        formdata.append('userID',mfile.id) 
+      formdata.append('date',mfile.date)
+      })      
     }
 
     //Posting to the Backend Array of files
-    // allUploads.map(uFile=> {
-    //   // console.log(uFile.upload.name)
-    //   formdata.append('files',uFile)
-    // })
-    formdata.append('files',[...fileList])
-    console.log(formdata.entries())
-    // axios.post('http://localhost:5000/upload', {...formdata},{headers: {"Content-Type": 'multipart/form-data'}})
-    //       .then(res =>{ console.log(res.data)})
-    //       .catch(err =>{ console.log('Error: ',err)})
-    // console.log(formdata)
+
     fetch('http://localhost:5000/upload', {
       method: 'POST',
       body: formdata,
     })
       .then((res) => res.json())
-      .then((data) => console.log(data.toString()))
+      .then((data) => {
+        setReset(prevReset =>[...prevReset, ...file])
+        console.log(`${data.length} files stored on ${Date().slice(0,25)}!`)
+        setFile([])
+      })
       .catch((err) => console.error(err));
-
-    setReset(allUploads) 
-    setFile([])
+    // console.log(file) 
+    setFile() 
+    
+    // file.map(item => formdata.delete(item.upload.name))
+    formdata.delete('files')
+    document.getElementById('file').value = null
+    // console.log(...formdata) 
     
   }
   
 
   const Deadline =()=>{
-    var countDownDate = new Date("Feb 28, 2023 15:52:00").getTime();
+    var countDownDate = new Date("Mar 8, 2023 15:52:00").getTime();
 
     // Update the count down every 1 second
     var x = setInterval(function() {
@@ -114,6 +129,7 @@ function Profile({user,...rest}) {
       var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
       // Display the result in the element with id="demo"
+     
       document.getElementById("demo").innerHTML = days + "d " + hours + "h "
       + minutes + "m " + seconds + "s ";
 
@@ -146,7 +162,7 @@ function Profile({user,...rest}) {
 
               {/* Page header */}
               <div className="max-w-3xl mx-auto text-center pb-6 md:pb-10">
-                <h1 className="h1">{location.state._id}</h1>
+                <h1 className="h1">{location.state.userID}</h1>
               </div>
               <div className="max-w-3xl mx-auto text-center pb-6 md:pb-10">
                 {/* <h6 className="h6">Fullname | {location.state.name}</h6> */}
@@ -175,27 +191,32 @@ function Profile({user,...rest}) {
           </div>
         </section>
         <div className='container'>
+              <div className="max-w-3xl mx-auto text-center pb-6 md:pb-10">
+                <h1 className="h4">Your Submission(s)</h1>
+              </div>
           
               {
-                (reset.length === 0 )?<p className='text-center'>Your submissions will be displayed here...</p>:
+                (reset.length === 0 )?<p className='text-center'>Kindly make a submission</p>:
+                
                 <table className="table table-dark table-hover">
                   <thead>
                     <tr>
                       <th scope="col">#</th>
                       <th scope="col">Filename</th>                      
-                      <th scope="col">Size</th>
+                      <th scope="col">Size(MB)</th>
                       <th scope="col">Date Submitted</th>
                     </tr>
                   </thead>
                   <tbody>
                   {
+                    
                     (reset.length > 0)?
-                      reset.map((el,ind)=>{    
-                        // console.log(el.upload)                                     
+                    reset.map((el,ind)=>{    
+                        // console.log(location.state.submission)                                     
                         return <tr key={ind}>
-                          <th scope="row">{ind}</th>
-                          <td>{el.upload.name}</td>                          
-                          <td>{el.upload.size}</td>
+                          <td>{ind}</td>
+                          <td>{el.filename}</td>                          
+                          <td>{(el.size/1000000).toFixed(2)}</td>
                           <td>{el.date}</td>
                         </tr>
                       }):null

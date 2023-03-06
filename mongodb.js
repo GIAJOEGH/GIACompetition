@@ -11,9 +11,16 @@ async function update(client, apply){
 }
 
 
-async function login(client,member){
-    const result = await client.db('Competition').collection('Contestant').findOne(member)
-    return result
+async function login(client,member){ 
+    if(member.email.includes('@gia.com.gh')){
+        const juror = await client.db('Competition').collection('Juror').findOne(member)
+        const contestants = await client.db('Competition').collection('Contestant').find({})
+        const result = {'juror': juror, 'contestant': await contestants.toArray()}
+        return result
+    }else{
+        const result = await client.db('Competition').collection('Contestant').findOne(member)
+        return result
+    }
 }
 
 async function insertProbationer(client, member){
@@ -27,18 +34,26 @@ async function insertStudent(client, member){
 }
 
 async function insertContestant(client, contestant){
-    const result = await client.db('Competition').collection('Contestant').insertOne(contestant)
-    // console.log(result)
+    const cursor = await client.db('Competition').collection('Contestant').find({})
+    const count = await cursor.toArray()
+    let userID = '0000'+(count.length+1)
+    console.log(userID.length, userID.length===5)
+    if(userID.length === 7){userID = userID.slice(3,7)}
+    if(userID.length === 6){userID = userID.slice(2,6)}
+    if(userID.length === 5){userID = userID.slice(1,5)}
+    userID = 'DYV'+userID
+    const result = await client.db('Competition').collection('Contestant').insertOne({...contestant, userID: userID})
+    // console.log(count.length)
 }
 
 
-async function updateFirm(client, param, member){
-    const result = await client.db('Members').collection('Firms').updateOne(
-        {ID: param.ID},{
-            $set:{...member}
+async function updateContestant(client, param, metaFile){
+    const result = await client.db('Competition').collection('Contestant').updateOne(
+        {userID: param.userID},{
+            $push:{submission: metaFile}
             // $set:{...member, Subscription: [{Date: Date(), Amount: member.Amount}]}
         }
-    )
+    )    
     return result
 }
 async function updateProbationer(client, param, member){
@@ -95,6 +110,6 @@ async function deleteMember(client, param){
 module.exports = {client, login, findProbationers,
     insertContestant, insertProbationer, deleteMember,
     insertFirm, findFirms, insertStudent, findStudents,
-    updateFirm, updateProbationer, updateStudent,    
+    updateContestant, updateProbationer, updateStudent,    
     update,
 }
