@@ -19,7 +19,7 @@ function SignUp() {
       password: e.target[4].value,
     }
 
-    // console.log('creating user...', user)
+    // console.log('creating user...', user)  'https://gia-competition.onrender.com/register'  'http://localhost:10000/register'
     axios.post('https://gia-competition.onrender.com/register',user)
           .then(res => {
             if(res.data.status === 'successful'){

@@ -21,7 +21,7 @@ function SignIn() {
       email : event.target[0].value||'email',
       password : event.target[1].value||'password'
     }
-    // console.log(login, Date())
+    // console.log(login, Date())  'https://gia-competition.onrender.com/login'  'http://localhost:10000/login'
   
     axios.post('https://gia-competition.onrender.com/login',login)
           .then(res => {

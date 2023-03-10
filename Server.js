@@ -70,7 +70,7 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
                 res.send(...result)
             }
     
-            fs.createReadStream(`./upload/${up.orignalname}`)
+            fs.createReadStream(`${__dirname}./upload/${up.orignalname}`)
               .pipe(bucket.openUploadStream(up.orignalname,{
                         chunkSizeBytes: 16* 1024,
                         metadata: up
@@ -83,7 +83,7 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
         
         const result = await updateContestant(client,param,{...req.files[0],date: req.body.date})
         // console.log(req.files[0])
-        fs.createReadStream(`./upload/${req.files[0].filename}`)
+        fs.createReadStream(path.resolve(__dirname,`./upload/${req.files[0].filename}`))
               .pipe(bucket.openUploadStream(req.files[0].filename,{
                         chunkSizeBytes: 16* 1024,
                         metadata: req.files[0]
