@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 // const {Server_IP, PORT}= require('./src/Constants')
-const uri = `mongodb://localhost:27017`;
-// const uri = "mongodb+srv://GIAJoe:giajoe1@cluster0.ocasz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+// const uri = `mongodb://localhost:27017`;
+const uri = "mongodb+srv://GIAJoe:giajoe1@cluster0.ocasz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 const client = new MongoClient(uri);
 
 
