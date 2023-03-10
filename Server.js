@@ -10,7 +10,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 // const jwt = require('jsonwebtoken')
 // const {PORT, Server_IP}=  require('./src/Constants')
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 10000
 const Server_IP = 'localhost'
 
 //GFS Setup Drivers with multer
