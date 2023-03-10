@@ -23,7 +23,7 @@ function SignIn() {
     }
     // console.log(login, Date())
   
-    axios.post('http://localhost:5000/login',login)
+    axios.post('/login',login)
           .then(res => {
             if(res.data.user.login === 'successful'){
               // console.log(res.data.user)              

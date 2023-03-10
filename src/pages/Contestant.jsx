@@ -100,9 +100,9 @@ function Profile({user,...rest}) {
       })      
     }
 
-    //Posting to the Backend Array of files
+    //Posting to the Backend Array of files 'http://localhost:5000/upload'
 
-    fetch('http://localhost:5000/upload', {
+    fetch('/upload', {
       method: 'POST',
       body: formdata,
     })

@@ -20,7 +20,7 @@ function SignUp() {
     }
 
     // console.log('creating user...', user)
-    axios.post('http://localhost:5000/register',user)
+    axios.post('/register',user)
           .then(res => {
             if(res.data.status === 'successful'){
               console.log('Successful: ',res.data)              
