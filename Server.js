@@ -56,47 +56,53 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
     // console.log(req.files)
 
     if(req.files.length > 1){
-        req.files.map(async (up,i)=>{
-            // console.log(req.body.date[i])
-                    
-            let param = {userID: req.body.userID[0]}           
-                 
-            const result = await updateContestant(client,param,{...up,date: req.body.date[i]})  
-            // console.log(result)
-            if((req.files.length-1 )=== i){
+        try{
+            req.files.map(async (up,i)=>{
+                // console.log(req.body.date[i])
+                        
+                let param = {userID: req.body.userID[0]}           
+                     
+                const result = await updateContestant(client,param,{...up,date: req.body.date[i]})  
                 // console.log(result)
-                delete result[0].password
-                req.body = [] //reset the body before the next upload
-                res.send(...result)
-            }
-    
-            fs.createReadStream(`${__dirname}./upload/${up.orignalname}`)
-              .pipe(bucket.openUploadStream(up.orignalname,{
-                        chunkSizeBytes: 16* 1024,
-                        metadata: up
-                    })) 
-            
-        })
+                if((req.files.length-1 )=== i){
+                    // console.log(result)
+                    delete result[0].password
+                    req.body = [] //reset the body before the next upload
+                    res.send(...result)
+                }
+        
+                fs.createReadStream(__dirname`./upload/${up.orignalname}`)
+                  .pipe(bucket.openUploadStream(up.orignalname,{
+                            chunkSizeBytes: 16* 1024,
+                            metadata: up
+                        })) 
+                
+            })
+        }catch(e){console.log(e)}
+        
     }else{
         // console.log(req.files[0], req.files[0].filename)
-        let param = {userID: req.body.userID}
+        try{
+            let param = {userID: req.body.userID}
         
-        const result = await updateContestant(client,param,{...req.files[0],date: req.body.date})
-        // console.log(req.files[0])
-        fs.createReadStream(path.resolve(__dirname,`./upload/${req.files[0].filename}`))
-              .pipe(bucket.openUploadStream(req.files[0].filename,{
-                        chunkSizeBytes: 16* 1024,
-                        metadata: req.files[0]
-                    })) 
-        // fs.readFileSync(`${req.files[0].orignalname}`, 'utf-8')
-        //       .pipe(bucket.openUploadStream(req.files[0].orignalname,{
-        //                 chunkSizeBytes: 16* 1024,
-        //                 metadata: req.files[0]
-        //             }))
-
-        delete result[0].password
-        req.body = [] //reset the body before the next upload
-        res.send(...result)
+            const result = await updateContestant(client,param,{...req.files[0],date: req.body.date})
+            // console.log(req.files[0])
+            fs.createReadStream(path.resolve(__dirname,`./upload/${req.files[0].filename}`))
+                  .pipe(bucket.openUploadStream(req.files[0].filename,{
+                            chunkSizeBytes: 16* 1024,
+                            metadata: req.files[0]
+                        })) 
+            // fs.readFileSync(`${req.files[0].orignalname}`, 'utf-8')
+            //       .pipe(bucket.openUploadStream(req.files[0].orignalname,{
+            //                 chunkSizeBytes: 16* 1024,
+            //                 metadata: req.files[0]
+            //             }))
+    
+            delete result[0].password
+            req.body = [] //reset the body before the next upload
+            res.send(...result)
+        }catch(e){console.log(e)}
+        
     }
     
     // bucket.openDownloadStreamByName('fwdfwdrinkmorewatercampaigncameroonivorycoast.zip')
