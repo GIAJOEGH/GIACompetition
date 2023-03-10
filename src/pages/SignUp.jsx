@@ -20,7 +20,7 @@ function SignUp() {
     }
 
     // console.log('creating user...', user)
-    axios.post('/register',user)
+    axios.post('https://gia-competition.onrender.com/register',user)
           .then(res => {
             if(res.data.status === 'successful'){
               console.log('Successful: ',res.data)              

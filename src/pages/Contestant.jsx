@@ -102,7 +102,7 @@ function Profile({user,...rest}) {
 
     //Posting to the Backend Array of files 'http://localhost:5000/upload'
 
-    fetch('https://localhost:10000/upload', {
+    fetch('https://gia-competition.onrender.com/upload', {
       method: 'POST',
       body: formdata,
     })
