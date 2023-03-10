@@ -32,6 +32,18 @@ function Profile({user,...rest}) {
       //  console.log(id, index)
   }
   
+  const handleDownload = (e,el)=>{
+    e.preventDefault()
+    // console.log(el)
+
+    const data = `data:,${el.path}`;
+    const filename = el.filename;
+    const aTag = document.createElement('a');
+
+    aTag.href = data;
+    aTag.download = filename;
+    aTag.click();
+  }
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -110,12 +122,14 @@ function Profile({user,...rest}) {
                     (contestants[selected].submission.length > 0)?
                     contestants[selected].submission.map((el,ind)=>{    
                         // console.log(location.state.submission)                                     
-                        return <tr key={ind}>
+                        return <tr key={ind} onClick={(e)=>handleDownload(e,el)} >
+                                  {/* <a href="data:application/xml;charset=utf-8" download={el.filename}>
+                                  </a> */}
                                   <td className=''>{el.filename}</td>
-                                  <td className='text-center'>{(el.size/1000000).toFixed(2)}</td>
-                                  <td className='text-center'>{el.date}</td>
+                                    <td className='text-center'>{(el.size/1000000).toFixed(2)}</td>
+                                    <td className='text-center'>{el.date}</td>
                                 </tr>
-                      }):'Contestant has made no submission'
+                      }):<p>Contestant has made no submission</p>
                     
                     
                   }

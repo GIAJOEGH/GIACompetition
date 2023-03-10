@@ -14,26 +14,32 @@ let submit = []
 let sub = []
 
 function Profile({user,...rest}) {
-
+  
   const location = useLocation()
   const [deadline, setDeadline] = useState(false)
   const [file, setFile] = useState([])
-  const [reset, setReset] = useState([...location.state.submission])
-
+  const [reset, setReset] = useState(location.state.submission)
+  
 
   useEffect(()=>{
 
     const fileSelector = document.getElementById('file');   
     const fileList = []
     // console.log(location.state.submission.length > 0)
-    // (location.state.submission.length >0)?setReset([...location.state.submission]):setReset([])
-    setReset([...location.state.submission])
+    // console.log(location.state)
+    // if(location.state.submission){
+    //   if(location.state.submission.length !== 'undefined'){
+    //     // console.log(location.state.submission)
+    //     (location.state.submission.length > 0)?setReset([...location.state.submission]):setReset([])
+    //   }
+    // }
+    // setReset(location.state.submission)
     fileSelector.addEventListener('change', (event) => {
       
       // setFile([])
       fileList.push(event.target.files);
       // console.log(event.target.files) 
-
+      // console.log(fileList)
       if(fileList[0].length >1){
         fileList.map((list,i)=>{
           sub.push(...fileList[i])
@@ -46,9 +52,9 @@ function Profile({user,...rest}) {
         })
         setFile([...submit])
 
-        while(fileList.length >0){
-          fileList.pop()
-        }
+        // while(fileList.length >0){
+        //   fileList.pop()
+        // }
         while(sub.length >0){
           sub.pop()
         }
@@ -59,30 +65,38 @@ function Profile({user,...rest}) {
       else{
         const submission = {'upload': fileList[0][0], 'date': Date().slice(0,25), 'id': location.state.userID}
         setFile([submission])
-        
+        // console.log(submission, fileList)
       } 
         // console.log(file)
+        while(fileList.length >0){
+          fileList.pop()
+        }
         
     });
 
-  },[file])
+  },[])
 
   const handleSubmit = (e) => {
     // const navigate = useNavigate();
     e.preventDefault()
-     
+    // console.log(file) 
     //Setting up the array of files for the backend
     if(!file.length){
-      // allUploads.push(file)  
+      // console.log(file) 
       formdata.append('files',file.upload)  
       formdata.append('userID',file.id) 
       formdata.append('date',file.date)
+    }else if(file.length === 1){
+      // console.log(file) 
+      formdata.append('files',file[0].upload)  
+      formdata.append('userID',file[0].id) 
+      formdata.append('date',file[0].date)
     }else{
       file.map((mfile)=> {
         // allUploads.push(mfile)
         formdata.append('files',mfile.upload) 
         formdata.append('userID',mfile.id) 
-      formdata.append('date',mfile.date)
+        formdata.append('date',mfile.date)
       })      
     }
 
@@ -94,15 +108,18 @@ function Profile({user,...rest}) {
     })
       .then((res) => res.json())
       .then((data) => {
-        setReset(prevReset =>[...prevReset, ...file])
-        console.log(`${data.length} files stored on ${Date().slice(0,25)}!`)
-        setFile([])
+        setReset([...data.submission])
+        // console.log(`${data.length} files stored on ${Date().slice(0,25)}!`)
+        // setFile([])        
+        // console.log(data) 
       })
       .catch((err) => console.error(err));
-    // console.log(file) 
-    setFile() 
+    // console.log(...formdata.entries()) 
+    setFile([]) 
     
     // file.map(item => formdata.delete(item.upload.name))
+    formdata.delete('date')
+    formdata.delete('userID')
     formdata.delete('files')
     document.getElementById('file').value = null
     // console.log(...formdata) 
@@ -111,7 +128,7 @@ function Profile({user,...rest}) {
   
 
   const Deadline =()=>{
-    var countDownDate = new Date("Mar 8, 2023 15:52:00").getTime();
+    var countDownDate = new Date("Mar 13, 2023 24:00:00").getTime();
 
     // Update the count down every 1 second
     var x = setInterval(function() {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../partials/Header';
@@ -11,6 +11,7 @@ import axios from 'axios'
 function SignIn() {
  
   const navigate = useNavigate();
+  const [status, setStatus] = useState('')
 
   const handleSubmit = (event) => {  
 
@@ -29,6 +30,7 @@ function SignIn() {
              if(res.data.user.juror && res.data.user.juror.email.includes('@gia.com.gh')){
               navigate('/juror', {state: { ...res.data.user}})
              }else{
+              // console.log(res.data.user) 
               navigate('/contestant', {state: { ...res.data.user}})
              }
               
@@ -39,6 +41,7 @@ function SignIn() {
           })
           .catch(err => {
             console.log(err)
+            setStatus('Login failed, Please try again!')
           })
     
   }
@@ -103,10 +106,10 @@ function SignIn() {
                     <div className="w-full px-3">
                       <div className="flex justify-between">
                         <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox" />
-                          <span className="text-gray-400 ml-2">Keep me signed in</span>
+                          {/* <input type="checkbox" className="form-checkbox" /> */}
+                          <span className="text-red-400 ml-2">{status}</span>
                         </label>
-                        <Link to="/reset-password" className="text-purple-600 hover:text-gray-200 transition duration-150 ease-in-out">Forgot Password?</Link>
+                        {/* <Link to="/reset-password" className="text-purple-600 hover:text-gray-200 transition duration-150 ease-in-out">Forgot Password?</Link> */}
                       </div>
                     </div>
                   </div>

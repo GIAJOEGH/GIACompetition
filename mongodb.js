@@ -12,25 +12,17 @@ async function update(client, apply){
 
 
 async function login(client,member){ 
-    if(member.email.includes('@gia.com.gh')){
+    if(member.email.includes('@gia.com.gh') && member.email.includes('juror')){ 
         const juror = await client.db('Competition').collection('Juror').findOne(member)
         const contestants = await client.db('Competition').collection('Contestant').find({})
+        delete juror.password
         const result = {'juror': juror, 'contestant': await contestants.toArray()}
         return result
-    }else{
+    }else{  
         const result = await client.db('Competition').collection('Contestant').findOne(member)
+        delete result.password
         return result
     }
-}
-
-async function insertProbationer(client, member){
-    const result = await client.db('Members').collection('Probationers').insertOne(member)
-    // console.log(result)
-}
-
-async function insertStudent(client, member){
-    const result = await client.db('Members').collection('Students').insertOne(member)
-    // console.log(result)
 }
 
 async function insertContestant(client, contestant){
@@ -53,50 +45,12 @@ async function updateContestant(client, param, metaFile){
             $push:{submission: metaFile}
             // $set:{...member, Subscription: [{Date: Date(), Amount: member.Amount}]}
         }
-    )    
-    return result
+    ) 
+    const cursor = await client.db('Competition').collection('Contestant').find({userID: param.userID})
+    const count = await cursor.toArray()   
+    // console.log(count, param.userID)
+    return count
 }
-async function updateProbationer(client, param, member){
-    const result = await client.db('Members').collection('Probationers').updateOne(
-        {ID: param.ID},{
-            $set:{...member}
-        }
-    )
-    return result
-}
-async function updateStudent(client, param, member){
-    const result = await client.db('Members').collection('Students').updateOne(
-        {ID: param.ID},{
-            $set:{...member}
-        }
-    )
-    return result
-}
-
-async function insertFirm(client, member){
-    const result = await client.db('Members').collection('Firms').insertOne(member)
-    console.log(result)
-}
-
-async function findProbationers(client){
-    const cursor = await client.db('Members').collection('Probationers').find({})
-    const result = await cursor.toArray()
-    return result
-}
-
-async function findStudents(client){
-    const cursor= await client.db('Members').collection('Students').find({})
-    const result = await cursor.toArray()
-    return result
-}
-
-
-async function findFirms(client){
-    const cursor = await client.db('Goodstanding').collection('Firms').find({})
-    const result = await cursor.toArray()
-    return result
-}
-
 
 async function deleteMember(client, param){
     delete param.member._id
@@ -107,9 +61,8 @@ async function deleteMember(client, param){
 
 // main().catch(console.error)
 
-module.exports = {client, login, findProbationers,
-    insertContestant, insertProbationer, deleteMember,
-    insertFirm, findFirms, insertStudent, findStudents,
-    updateContestant, updateProbationer, updateStudent,    
+module.exports = {client, login, 
+    insertContestant,  deleteMember,
+    updateContestant,    
     update,
 }

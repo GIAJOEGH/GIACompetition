@@ -1,7 +1,5 @@
-const {client, login, insertContestant,  deleteMember,
-    findFirms, insertFirm, findProbationers,
-    insertProbationer, insertStudent, findStudents,
-     updateContestant, updateProbationer, updateStudent,
+const {client, login, insertContestant,  deleteMember,    
+     updateContestant, 
     
 } = require('./mongodb')
 
@@ -41,51 +39,70 @@ const multerStorage = multer.diskStorage({
     }
 })
 
+// const multerStorage = multer.memoryStorage({
+//     filename: (req,file,cb)=>{
+//                 cb(null,file.originalname)
+//             }
+// })
+
 const upload = multer({storage: multerStorage})
 
 
 
 //Routes
-app.get('/firms',async (req,res)=>{
-    // await client.connect()
-    // const firms = await findFirms(client)
-    // res.status(200).send(firms)
-    console.log('endpoint reached!')
-})
 
-app.get('/probationers',async (req,res)=>{
-    await client.connect()
-    const probationers = await findProbationers(client)
-    res.status(200).send(probationers)
-})
+app.post('/upload',upload.array('files'),async (req,res)=>{
+    // console.log(req.body, req.files.length)
+    // console.log(req.files)
 
-app.post('/upload',upload.array('files'), (req,res)=>{
-    // console.log(req.body)
-    req.files.map(async (up,i)=>{
-        // console.log(up.filename)
-                
-        let param = {userID: req.body.userID[0]}
-        let metaFile = {
-            date: req.body.date[i],
-            contestant: req.body.userID[0],
-            filename: up.filename,
-            size: up.size,
-            encoding: up.encoding,
-            mimetype: up.mimetype            
-        }       
-        const result = await updateContestant(client,param,metaFile)
-        console.log(result)
+    if(req.files.length > 1){
+        req.files.map(async (up,i)=>{
+            // console.log(req.body.date[i])
+                    
+            let param = {userID: req.body.userID[0]}           
+                 
+            const result = await updateContestant(client,param,{...up,date: req.body.date[i]})  
+            // console.log(result)
+            if((req.files.length-1 )=== i){
+                // console.log(result)
+                delete result[0].password
+                req.body = [] //reset the body before the next upload
+                res.send(...result)
+            }
+    
+            fs.createReadStream(`./upload/${up.orignalname}`)
+              .pipe(bucket.openUploadStream(up.orignalname,{
+                        chunkSizeBytes: 16* 1024,
+                        metadata: up
+                    })) 
+            
+        })
+    }else{
+        // console.log(req.files[0], req.files[0].filename)
+        let param = {userID: req.body.userID}
+        
+        const result = await updateContestant(client,param,{...req.files[0],date: req.body.date})
+        // console.log(req.files[0])
+        fs.createReadStream(`./upload/${req.files[0].filename}`)
+              .pipe(bucket.openUploadStream(req.files[0].filename,{
+                        chunkSizeBytes: 16* 1024,
+                        metadata: req.files[0]
+                    })) 
+        // fs.readFileSync(`${req.files[0].orignalname}`, 'utf-8')
+        //       .pipe(bucket.openUploadStream(req.files[0].orignalname,{
+        //                 chunkSizeBytes: 16* 1024,
+        //                 metadata: req.files[0]
+        //             }))
 
-        fs.createReadStream(`./upload/${up.filename}`)
-          .pipe(bucket.openUploadStream(up.filename,{
-                    chunkSizeBytes: 16* 1024,
-                    metadata: up
-                })) 
-    })
+        delete result[0].password
+        req.body = [] //reset the body before the next upload
+        res.send(...result)
+    }
     
     // bucket.openDownloadStreamByName('fwdfwdrinkmorewatercampaigncameroonivorycoast.zip')
     //       .pipe(fs.createWriteStream('./download/fwdfwdrinkmorewatercampaigncameroonivorycoast.zip'))  
-    res.json(req.files)
+    // console.log(result)
+    // res.status(200).send(result[result.length])
 })
 
 app.post('/login',async (req,res)=>{
@@ -101,10 +118,12 @@ app.post('/login',async (req,res)=>{
             ...out,
             login: 'successful'
         }
-
+        // console.log(out.juror.email)
         // const token = jwt.sign(user, 'Joe||GIA')
-        console.log('login successful!')
-        // console.log(out)
+        if(out.juror){
+            console.log(out.juror.email, 'login successful!')
+        }else{console.log(out.email, 'login successful!')}
+        
         // res.status(200).send({token})
         res.status(200).send({user})
     }else{
@@ -139,61 +158,6 @@ app.post('/updatecontestant', async (req,res)=>{
     const result = await updateContestant(client,param,member)
     // console.log(req.body.Name, ' updated into the DB!')
     // console.log(member)
-    res.send(result)
-})
-
-app.post('/updateprobationer', async (req,res)=>{
-    await client.connect()
-    let param = {ID: req.body.ID}
-    let member = {
-        Name: req.body.name,
-        Email: req.body.email,
-        Office: req.body.office,
-        Location: req.body.location,
-        Amount: req.body.amount,
-        Mobile: req.body.mobile,
-        Principal_of_firm: req.body.principal
-    }
-    const result = await updateProbationer(client,param,member)
-    res.send(result)
-})
-
-app.post('/updatestudent', async (req,res)=>{
-    await client.connect()
-    let param = {ID: req.body.ID}
-    let member = {
-        Name: req.body.name,
-        Email: req.body.email,
-        Office: req.body.office,
-        Location: req.body.location,
-        Amount: req.body.amount,
-        Mobile: req.body.mobile,
-        Principal_of_firm: req.body.principal
-    }
-    const result = await updateStudent(client,param,member)
-    res.send(result)
-})
-
-
-
-app.post('/insertfirm', async (req,res)=>{
-    await client.connect()
-    const result = await insertFirm(client,req.body)
-    console.log(req.body.Office, ' inserted into the DB!')
-    res.send(result)
-})
-
-app.post('/insertprobationer', async (req,res)=>{
-    await client.connect()
-    const result = await insertProbationer(client,req.body)
-    console.log(req.body.Name, ' inserted into the DB!')
-    res.send(result)
-})
-
-app.post('/insertstudent', async (req,res)=>{
-    await client.connect()
-    const result = await insertStudent(client,req.body)
-    console.log(req.body.Name, ' inserted into the DB!')
     res.send(result)
 })
 
