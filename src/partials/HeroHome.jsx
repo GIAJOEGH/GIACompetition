@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../utils/Modal';
 
-import HeroImage from '../images/hero-image-01.jpg';
+import HeroImage from '../images/wad.png';
 
 function HeroHome() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
@@ -37,10 +37,11 @@ function HeroHome() {
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4" data-aos="fade-up">
-              Design Competition February 2023
+            PROPOSED DIGITAL YOUTH VILLAGE 
             </h1>
             <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">
-              The call for submission of designs to partake in this years competition has a digital dimension. Ready your designs and let's dazel and win!
+              The Organisation of an Architectural Design Competition for the Proposed Digital Youth Village at University of Ghana, Legon leading to
+              ion of a winning scheme for the implementation to be led by the Architectural Firm of the Winning Scheme.
             </p>
             {/* <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
               <div data-aos="fade-up" data-aos-delay="400">
@@ -55,11 +56,26 @@ function HeroHome() {
               </div>
             </div> */}
           </div>
-
+          {/* Section header */}
+          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
+            <h2 className="h2 mb-4">Competition Promoters</h2>
+            <p className="text-xl text-gray-400">
+              MINISTRY OF COMMUNICATION & DIGITALISATION
+              UNIVERSITY OF GHANA
+            </p>
+          </div>
+          {/* Section header */}
+          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
+            <h2 className="h2 mb-4">Competition Organisers</h2>
+            <p className="text-xl text-gray-400">
+              GHANA INSTITUTE OF ARCHITECTS
+            </p>
+          </div>
+          
           {/* Hero image */}
           <div>
             <div className="relative flex justify-center items-center" data-aos="fade-up" data-aos-delay="200">
-              <img className="mx-auto" src={HeroImage} width="1024" height="504" alt="Hero" />
+              <img className="mx-auto" src={HeroImage} width="1024" height="250" alt="Hero" />
               <a
                 className="absolute group"
                 href="#0"
@@ -93,11 +109,30 @@ function HeroHome() {
             {/* Modal */}
             <Modal id="modal" ariaLabel="modal-headline" show={videoModalOpen} handleClose={() => setVideoModalOpen(false)}>
               <div className="relative pb-9/16">
-                <iframe className="absolute w-full h-full" src="https://player.vimeo.com/video/174002812" title="Video" allowFullScreen></iframe>
+                <iframe className="absolute w-full h-full" src="https://www.youtube.com/watch?v=vfTp4ljMJmc" title="Video" allowFullScreen></iframe>
               </div>
             </Modal>
           </div>
+          <br></br>          
         </div>
+        {/* Section header */}
+        <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
+            <h2 className="h2 mb-4">
+              General Information - Continuation HONORARIA   </h2>
+            <p className="text-xl text-gray-400">
+            It is expected that 3 teams will be selected as winners for prize as follows:
+            
+            </p>
+            <p className="text-xl text-gray-400">            
+              1st Prize GHS50,000.00            
+            </p>
+            <p className="text-xl text-gray-400">            
+            2nd Prize GHS30,000.00           
+            </p>
+            <p className="text-xl text-gray-400">            
+            3rd Prize GHS20,000.00          
+            </p>
+          </div>
       </div>
     </section>
   );
