@@ -41,7 +41,7 @@ function HeroHome() {
             </h1>
             <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">
               The Organisation of an Architectural Design Competition for the Proposed Digital Youth Village at University of Ghana, Legon leading to
-              ion of a winning scheme for the implementation to be led by the Architectural Firm of the Winning Scheme.
+              selection of a winning scheme for the implementation to be led by the Architectural Firm of the Winning Scheme.
             </p>
             {/* <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
               <div data-aos="fade-up" data-aos-delay="400">
