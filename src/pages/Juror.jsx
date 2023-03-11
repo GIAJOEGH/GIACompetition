@@ -125,7 +125,7 @@ function Profile({user,...rest}) {
                         return <tr key={ind} onClick={(e)=>handleDownload(e,el)} >
                                   {/* <a href="data:application/xml;charset=utf-8" download={el.filename}>
                                   </a> */}
-                                  <td className=''>{el.filename}</td>
+                                  <td className=''>{el.originalname}</td>
                                     <td className='text-center'>{(el.size/1000000).toFixed(2)}</td>
                                     <td className='text-center'>{el.date}</td>
                                 </tr>
