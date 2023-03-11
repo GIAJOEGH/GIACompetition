@@ -17,7 +17,7 @@ const Server_IP = 'localhost'
 const fs = require('fs')
 const mongo = require('mongodb')
 const multer = require('multer')
-const { request } = require('http')
+const streamifier = require('streamifier')
 // const Grid = require('gridfs-stream')
 // const GridFsStorage = require('multer-gridfs-storage')
 
@@ -32,28 +32,34 @@ app.use(bodyParser.urlencoded({ extended: true }))
 //GFS
 const db = client.db('Competition')
 const bucket = new mongo.GridFSBucket(db,{'bktName': 'compFiles'})
-const multerStorage = multer.diskStorage({
-    destination: './upload',
-    filename: (req,file,cb)=>{
-        cb(null,file.originalname)
-    }
-})
-
-// const multerStorage = multer.memoryStorage({
+// const multerStorage = multer.diskStorage({
+//     destination: './upload',
 //     filename: (req,file,cb)=>{
-//                 cb(null,file.originalname)
-//             }
+//         cb(null,file.originalname)
+//     }
 // })
 
-const upload = multer({storage: multerStorage})
+const multerStorage = multer.memoryStorage({
+    destination: (req,file,cb)=>{
+                // console.log(file)
+                cb(null,file)
+            }
+})
 
+const upload = multer({storage: multerStorage})
+// const bufferToStream =(myBuffer)=> {
+//     let tmp = new Duplex();
+//     tmp.push(myBuffer);
+//     tmp.push(null);
+//     return tmp;
+// }
 
 
 //Routes
 
 app.post('/upload',upload.array('files'),async (req,res)=>{
     // console.log(req.body, req.files.length)
-    // console.log(req.files)
+    // console.log(req.files, req.body)
 
     if(req.files.length > 1){
         try{
@@ -63,7 +69,7 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
                 let param = {userID: req.body.userID[0]}           
                      
                 const result = await updateContestant(client,param,{...up,date: req.body.date[i]})  
-                // console.log(result)
+                console.log(up)
                 if((req.files.length-1 )=== i){
                     // console.log(result)
                     delete result[0].password
@@ -71,14 +77,19 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
                     res.send(...result)
                 }
         
-                fs.createReadStream(__dirname`./upload/${up.orignalname}`)
+                // fs.createReadStream(__dirname`./upload/${up.orignalname}`)
+                //   .pipe(bucket.openUploadStream(up.orignalname,{
+                //             chunkSizeBytes: 16* 1024,
+                //             metadata: up
+                //         })) 
+                streamifier.createReadStream(up.buffer)
                   .pipe(bucket.openUploadStream(up.orignalname,{
                             chunkSizeBytes: 16* 1024,
                             metadata: up
                         })) 
                 
             })
-        }catch(e){console.log(e)}
+        }catch(e){console.log('Error reading multiple files')}
         
     }else{
         // console.log(req.files[0], req.files[0].filename)
@@ -87,21 +98,27 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
         
             const result = await updateContestant(client,param,{...req.files[0],date: req.body.date})
             // console.log(req.files[0])
-            fs.createReadStream(path.resolve(__dirname,`./upload/${req.files[0].filename}`))
-                  .pipe(bucket.openUploadStream(req.files[0].filename,{
-                            chunkSizeBytes: 16* 1024,
-                            metadata: req.files[0]
-                        })) 
-            // fs.readFileSync(`${req.files[0].orignalname}`, 'utf-8')
-            //       .pipe(bucket.openUploadStream(req.files[0].orignalname,{
+            // fs.createReadStream(path.resolve(__dirname,`./upload/${req.files[0].filename}`))
+            //       .pipe(bucket.openUploadStream(req.files[0].filename,{
             //                 chunkSizeBytes: 16* 1024,
             //                 metadata: req.files[0]
+            //             })) 
+            // fs.createReadStream(`${req.files[0].orignalname}`, 'binary')
+            //       .pipe(bucket.openUploadStream(req.files[0].orignalname,{
+            //                 chunkSizeBytes:  16* 1024,
+            //                 metadata: req.files[0]
             //             }))
-    
+            // console.log(bufferToStream(req.files[0].buffer))
+            streamifier.createReadStream(req.files[0].buffer)
+            .pipe(bucket.openUploadStream(req.files[0].orignalname,{
+                chunkSizeBytes: 16* 1024,
+                metadata: req.files[0]
+            }))
+
             delete result[0].password
             req.body = [] //reset the body before the next upload
             res.send(...result)
-        }catch(e){console.log(e)}
+        }catch(e){console.log('Error reading file')}
         
     }
     

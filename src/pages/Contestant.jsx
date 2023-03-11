@@ -34,12 +34,13 @@ function Profile({user,...rest}) {
     //   }
     // }
     // setReset(location.state.submission)
+    
     fileSelector.addEventListener('change', (event) => {
       
       // setFile([])
       fileList.push(event.target.files);
-      // console.log(event.target.files) 
-      // console.log(fileList)
+      
+      // console.log(path)
       if(fileList[0].length >1){
         fileList.map((list,i)=>{
           sub.push(...fileList[i])
@@ -102,7 +103,7 @@ function Profile({user,...rest}) {
 
     //Posting to the Backend Array of files 'http://localhost:5000/upload'  'https://gia-competition.onrender.com/upload'
 
-    fetch('https://gia-competition.onrender.com/upload', {
+    fetch('http://localhost:10000/upload' , {
       method: 'POST',
       body: formdata,
     })
@@ -232,7 +233,7 @@ function Profile({user,...rest}) {
                         // console.log(location.state.submission)                                     
                         return <tr key={ind}>
                           <td>{ind}</td>
-                          <td>{el.filename}</td>                          
+                          <td>{el.originalname}</td>                          
                           <td>{(el.size/1000000).toFixed(2)}</td>
                           <td>{el.date}</td>
                         </tr>
