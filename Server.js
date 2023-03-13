@@ -84,7 +84,7 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
                 //         })) 
                 streamifier.createReadStream(up.buffer)
                   .pipe(bucket.openUploadStream(up.orignalname,{
-                            chunkSizeBytes: 16* 1024,
+                            chunkSizeBytes: 1* 1024,
                             metadata: up
                         })) 
                 
