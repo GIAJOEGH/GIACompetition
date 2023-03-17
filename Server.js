@@ -84,7 +84,7 @@ app.post('/upload',upload.array('files'),async (req,res)=>{
                 //         })) GIA2023Comp
                 streamifier.createReadStream(up.buffer)
                   .pipe(bucket.openUploadStream(up.orignalname,{
-                            chunkSizeBytes: 504* 1024,
+                            chunkSizeBytes: 16* 1024,
                             metadata: up
                         })) 
                 
